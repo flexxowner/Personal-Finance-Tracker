@@ -15,5 +15,8 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.10"/>
   </ItemGroup>
 </Project>
