@@ -1,4 +1,6 @@
-﻿namespace FinanceTracker.Domain.Entities;
+﻿using FinanceTracker.Domain.Enums;
+
+namespace FinanceTracker.Domain.Entities;
 
 public sealed class Transaction
 {
@@ -6,15 +8,13 @@ public sealed class Transaction
 
     public Guid CategoryId { get; set; }
 
-    public Guid BudgetId { get; set; }
+    public Guid? BudgetId { get; set; }
 
-    public Guid UserId { get; set; }
+    public Guid OwnerId { get; set; }
 
     public Guid AccountId { get; set; }
 
     public decimal Amount { get; set; }
-
-    public string SourceCurrency { get; set; } = string.Empty;
 
     public DateTime OccurredAtUtc { get; set; }
 
@@ -23,4 +23,14 @@ public sealed class Transaction
     public string TransactionCurrency { get; set; } = string.Empty;
 
     public decimal ExchangeRate { get; set; }
+
+    public CategoryType Type { get; set; }
+
+    public User Owner { get; set; }
+
+    public Budget? Budget { get; set; }
+
+    public Account Account { get; set; }
+
+    public Category Category { get; set; }
 }

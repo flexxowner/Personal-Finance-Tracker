@@ -1,6 +1,4 @@
-﻿using FinanceTracker.Domain.Enums;
-
-namespace FinanceTracker.Domain.Entities;
+﻿namespace FinanceTracker.Domain.Entities;
 
 public sealed class Category
 {
@@ -8,7 +6,9 @@ public sealed class Category
 
     public string Name { get; set; } = string.Empty;
 
-    public CategoryType Type { get; set; }
-
     public Guid OwnerId { get; set; }
+
+    public User Owner {  get; set; }
+
+    public ICollection<Transaction> Transactions { get; set; }
 }

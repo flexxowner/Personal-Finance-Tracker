@@ -4,7 +4,7 @@ public sealed class Profile
 {
     public Guid ProfileId { get; set; }
 
-    public Guid UserId { get; set; }
+    public Guid OwnerId { get; set; }
 
     public string DefaultCurrency { get; set; } = string.Empty;
 
@@ -12,5 +12,5 @@ public sealed class Profile
 
     public string DisplayName { get; set; } = string.Empty;
 
-    public User User { get; set; } = null!;
+    public User Owner { get; set; } = null!;
 }

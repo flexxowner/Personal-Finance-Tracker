@@ -6,7 +6,7 @@ public sealed class Account
 {
     public Guid AccountId { get; set; }
 
-    public Guid UserId { get; set; }
+    public Guid OwnerId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
@@ -21,4 +21,8 @@ public sealed class Account
     public DateTime CreatedUtc { get; set; }
 
     public DateTime UpdatedUtc { get; set; }
+
+    public ICollection<Transaction> Transactions { get; set; }
+
+    public User Owner { get; set; }
 }

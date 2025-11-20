@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinanceTracker.Infrastructure.Data.Configurations;
 
-public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
+internal class ProfileConfiguration : IEntityTypeConfiguration<Profile>
 {
     public void Configure(EntityTypeBuilder<Profile> builder)
     {
@@ -22,5 +22,10 @@ public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
 
         builder.Property(p => p.DisplayName)
             .HasMaxLength(100);
+
+        builder.HasOne(p => p.Owner)
+            .WithOne(o => o.Profile)
+            .HasForeignKey<Profile>(p => p.OwnerId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
