@@ -4,33 +4,63 @@ namespace FinanceTracker.Domain.Entities;
 
 public sealed class Transaction
 {
-    public Guid TransactionId { get; set; }
+    public Guid TransactionId { get; private set; }
+    public Guid CategoryId { get; private set; }
+    public Guid? BudgetId { get; private set; }
+    public Guid OwnerId { get; private set; }
+    public Guid AccountId { get; private set; }
 
-    public Guid CategoryId { get; set; }
+    public decimal Amount { get; private set; }
+    public DateTime OccurredAtUtc { get; private set; }
+    public string Note { get; private set; } = string.Empty;
+    public string TransactionCurrency { get; private set; } = string.Empty;
+    public decimal ExchangeRate { get; private set; }
+    public CategoryType Type { get; private set; }
 
-    public Guid? BudgetId { get; set; }
+    public User Owner { get; private set; }
+    public Budget? Budget { get; private set; }
+    public Account Account { get; private set; }
+    public Category Category { get; private set; }
 
-    public Guid OwnerId { get; set; }
+    private Transaction() { }
 
-    public Guid AccountId { get; set; }
+    public Transaction(
+        Guid ownerId,
+        Guid accountId,
+        Guid categoryId,
+        CategoryType type,
+        decimal amount,
+        string currency,
+        decimal exchangeRate,
+        DateTime occurredAt,
+        string? note,
+        Guid? budgetId = null)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("The transaction amount must be greater than zero.", nameof(amount));
 
-    public decimal Amount { get; set; }
+        if (string.IsNullOrWhiteSpace(currency))
+            throw new ArgumentException("Currency is mandatory", nameof(currency));
 
-    public DateTime OccurredAtUtc { get; set; }
+        if (exchangeRate <= 0)
+            throw new ArgumentException("The exchange rate must be positive", nameof(exchangeRate));
 
-    public string Note { get; set; } = string.Empty;
+        if (accountId == Guid.Empty) throw new ArgumentException("Account not specified", nameof(accountId));
+        if (categoryId == Guid.Empty) throw new ArgumentException("Category not specified", nameof(categoryId));
+        if (ownerId == Guid.Empty) throw new ArgumentException("Owner not specified", nameof(ownerId));
 
-    public string TransactionCurrency { get; set; } = string.Empty;
+        TransactionId = Guid.NewGuid();
+        OwnerId = ownerId;
+        AccountId = accountId;
+        CategoryId = categoryId;
+        Type = type;
+        Amount = amount;
+        TransactionCurrency = currency.ToUpper();
+        ExchangeRate = exchangeRate;
+        OccurredAtUtc = occurredAt;
+        Note = note ?? string.Empty;
+        BudgetId = budgetId;
+    }
 
-    public decimal ExchangeRate { get; set; }
-
-    public CategoryType Type { get; set; }
-
-    public User Owner { get; set; }
-
-    public Budget? Budget { get; set; }
-
-    public Account Account { get; set; }
-
-    public Category Category { get; set; }
+    public void UpdateNote(string? note) => Note = note ?? string.Empty;
 }
