@@ -1,3 +1,4 @@
+using FinanceTracker.Application;
 using FinanceTracker.Infrastructure;
 using Serilog;
 using System.Text.Json.Serialization;
@@ -9,7 +10,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddApplication();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
