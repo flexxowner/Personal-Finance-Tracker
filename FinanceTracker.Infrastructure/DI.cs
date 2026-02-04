@@ -1,4 +1,6 @@
-﻿using FinanceTracker.Infrastructure.Data;
+﻿using FinanceTracker.Application.Common.Interfaces.Authentication;
+using FinanceTracker.Infrastructure.Authentication;
+using FinanceTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +21,9 @@ public static class DI
                 npgsqlOptions.EnableRetryOnFailure(3);
             });
         });
+
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtProvider, JwtProvider>();
 
         return services;
     }
