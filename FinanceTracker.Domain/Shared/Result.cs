@@ -9,7 +9,12 @@ public enum ErrorType
     Conflict
 }
 
-public record Result
+public interface IResult<TSelf> where TSelf: IResult<TSelf>
+{
+    static abstract TSelf Failure(ResultError error);
+}
+
+public record Result : IResult<Result>
 {
     protected Result(bool isSuccess, ResultError error)
     {
@@ -30,7 +35,7 @@ public record Result
     public static Result<T> Failure<T>(ResultError error) => Result<T>.Failure(error);
 }
 
-public record Result<T> : Result
+public record Result<T> : Result, IResult<Result>
 {
     private readonly T? _value;
 

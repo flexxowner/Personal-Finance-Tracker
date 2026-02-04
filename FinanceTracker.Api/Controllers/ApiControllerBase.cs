@@ -11,11 +11,22 @@ public class ApiControllerBase : ControllerBase
         return error.Type switch
         {
             ErrorType.None => throw new InvalidOperationException(),
-            ErrorType.NullValue => BadRequest(new { error = error.Message }),
-            ErrorType.Validation => BadRequest(new { error = error.Message }),
-            ErrorType.NotFound => NotFound(new { error = error.Message }),
-            ErrorType.Conflict => Conflict(new { error = error.Message }),
-            _ => StatusCode(500, new { error = "An unexpected error occurred" }),
+            ErrorType.NullValue => BadRequest(CreateDetailedResult(error, StatusCodes.Status400BadRequest)),
+            ErrorType.Validation => BadRequest(CreateDetailedResult(error, StatusCodes.Status400BadRequest)),
+            ErrorType.NotFound => NotFound(CreateDetailedResult(error, StatusCodes.Status404NotFound)),
+            ErrorType.Conflict => Conflict(CreateDetailedResult(error, StatusCodes.Status409Conflict)),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, CreateDetailedResult(error, StatusCodes.Status500InternalServerError)),
+        };
+    }
+
+    private static ProblemDetails CreateDetailedResult(ResultError error, int status)
+    {
+        return new ProblemDetails
+        {
+            Title = error.Title,
+            Detail = error.Details,
+            Status = status,
+            Extensions = { { "errors:", error.ErrorMessages } }
         };
     }
 }

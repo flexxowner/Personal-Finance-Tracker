@@ -20,5 +20,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.10"/>
     <PackageVersion Include="MediatR" Version="13.1.0"/>
     <PackageVersion Include="Mapster" Version="7.4.0"/>
+    <PackageVersion Include="FluentValidation" Version="12.1.1"/>
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1"/>
   </ItemGroup>
 </Project>

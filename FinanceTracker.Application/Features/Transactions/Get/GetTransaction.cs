@@ -3,14 +3,15 @@ using FinanceTracker.Domain.Shared.Errors;
 using FinanceTracker.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Transactions;
 
 namespace FinanceTracker.Application.Features.Transactions.Get;
 
-public record GetTransactionQuery(Guid Id) : IRequest<Result<TransactionDto>>;
+public record GetTransaction(Guid Id) : IRequest<Result<TransactionDto>>;
 
-public class Handler(AppDbContext dbContext) : IRequestHandler<GetTransactionQuery, Result<TransactionDto>>
+public class Handler(AppDbContext dbContext) : IRequestHandler<GetTransaction, Result<TransactionDto>>
 {
-    public async Task<Result<TransactionDto>> Handle(GetTransactionQuery request, CancellationToken cancellationToken)
+    public async Task<Result<TransactionDto>> Handle(GetTransaction request, CancellationToken cancellationToken)
     {
         var transaction = await dbContext.Transactions
             .AsNoTracking()
@@ -18,7 +19,7 @@ public class Handler(AppDbContext dbContext) : IRequestHandler<GetTransactionQue
 
         if (transaction is null)
         {
-            return Result.Failure<TransactionDto>(new TransactionNotFound(request.Id));
+            return Result.Failure<TransactionDto>(new EntityNotFound<Transaction>(request.Id));
         }
 
         return new TransactionDto(transaction.TransactionId)

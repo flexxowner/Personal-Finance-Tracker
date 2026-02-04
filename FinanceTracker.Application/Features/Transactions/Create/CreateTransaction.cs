@@ -1,13 +1,16 @@
 ﻿using FinanceTracker.Domain.Entities;
 using FinanceTracker.Domain.Enums;
+using FinanceTracker.Domain.Shared;
+using FinanceTracker.Domain.Shared.Errors;
 using FinanceTracker.Infrastructure.Data;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.Application.Features.Transactions.Create;
 
-public class CreateTransaction
+public static class CreateTransaction
 {
-    public record Command : IRequest<Guid>
+    public record Command : IRequest<Result<Guid>>
     {
         public decimal Amount { get; init; }
         public string? Note { get; init; }
@@ -22,10 +25,30 @@ public class CreateTransaction
         public Guid AccountId { get; init; }
     }
 
-    public class Handler(AppDbContext context) : IRequestHandler<Command, Guid>
+    public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Guid>>
     {
-        public async Task<Guid> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var accountExists = await context
+                .Accounts
+                .AsNoTracking()
+                .AnyAsync(a => a.AccountId == request.AccountId, cancellationToken: cancellationToken);
+
+            var categoryExists = await context
+                .Categories
+                .AsNoTracking()
+                .AnyAsync(a => a.CategoryId == request.CategoryId, cancellationToken: cancellationToken);
+
+            if (!accountExists)
+            {
+                return Result.Failure<Guid>(new EntityNotFound<Account>(request.AccountId));
+            }
+
+            if (!categoryExists)
+            {
+                return Result.Failure<Guid>(new EntityNotFound<Category>(request.CategoryId));
+            }
+
             var transaction = new Transaction(
                 ownerId: request.OwnerId,
                 accountId: request.AccountId,
