@@ -1,4 +1,5 @@
-﻿using FinanceTracker.Application.Common.Interfaces.Authentication;
+﻿using FinanceTracker.Application.Common.Interfaces;
+using FinanceTracker.Application.Common.Interfaces.Authentication;
 using FinanceTracker.Infrastructure.Authentication;
 using FinanceTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ public static class DI
             });
         });
 
+        services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtProvider, JwtProvider>();
 
