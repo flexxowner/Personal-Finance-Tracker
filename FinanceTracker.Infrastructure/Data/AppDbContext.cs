@@ -1,10 +1,11 @@
-﻿using FinanceTracker.Domain.Entities;
+﻿using FinanceTracker.Application.Common.Interfaces;
+using FinanceTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace FinanceTracker.Infrastructure.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) 
+    : DbContext(options), IAppDbContext
 {
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Profile> Profiles { get; set; } = null!;

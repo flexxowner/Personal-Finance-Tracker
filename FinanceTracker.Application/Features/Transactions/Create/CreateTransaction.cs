@@ -1,8 +1,8 @@
-﻿using FinanceTracker.Domain.Entities;
+﻿using FinanceTracker.Application.Common.Interfaces;
+using FinanceTracker.Domain.Entities;
 using FinanceTracker.Domain.Enums;
 using FinanceTracker.Domain.Shared;
 using FinanceTracker.Domain.Shared.Errors;
-using FinanceTracker.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +25,7 @@ public static class CreateTransaction
         public Guid AccountId { get; init; }
     }
 
-    public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Guid>>
+    public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
         {
