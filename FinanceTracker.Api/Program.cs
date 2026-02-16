@@ -1,5 +1,6 @@
 using FinanceTracker.Application;
 using FinanceTracker.Infrastructure;
+using Scalar.AspNetCore;
 using Serilog;
 using System.Text.Json.Serialization;
 
@@ -16,8 +17,8 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
@@ -36,8 +37,12 @@ app.UseSerilogRequestLogging(options =>
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTheme(ScalarTheme.DeepSpace);
+        options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
 }
 
 app.UseHttpsRedirection();
