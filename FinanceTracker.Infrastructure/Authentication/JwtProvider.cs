@@ -26,7 +26,7 @@ public class JwtProvider(IConfiguration configuration) : IJwtProvider
 
         var token = new JwtSecurityToken(
             issuer: configuration["JwtSettings:Issuer"],
-            audience: configuration["JwtSettings: Audience"],
+            audience: configuration["JwtSettings:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddDays(7),
             signingCredentials: credentials);

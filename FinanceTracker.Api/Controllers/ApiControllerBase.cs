@@ -6,8 +6,10 @@ namespace FinanceTracker.Api.Controllers;
 [ApiController]
 public class ApiControllerBase : ControllerBase
 {
-    protected IActionResult HandleFailure(ResultError error)
+    protected ActionResult HandleFailure(Result failureResult)
     {
+        var error = failureResult.Error;
+
         return error.Type switch
         {
             ErrorType.None => throw new InvalidOperationException(),

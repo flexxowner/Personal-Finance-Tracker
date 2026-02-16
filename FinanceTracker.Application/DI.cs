@@ -1,4 +1,5 @@
-﻿using FinanceTracker.Application.Features.Transactions.Create;
+﻿using FinanceTracker.Application.Features.Auth;
+using FinanceTracker.Application.Features.Transactions.Create;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,7 @@ public static class DI
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DI).Assembly));
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
-
+        services.AddScoped<IAuthService, AuthService>();
         return services;
     }
 }
