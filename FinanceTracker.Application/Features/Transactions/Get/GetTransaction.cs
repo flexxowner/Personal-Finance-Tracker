@@ -1,6 +1,6 @@
-﻿using FinanceTracker.Domain.Shared;
+﻿using FinanceTracker.Application.Common.Interfaces;
+using FinanceTracker.Domain.Shared;
 using FinanceTracker.Domain.Shared.Errors;
-using FinanceTracker.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
@@ -9,7 +9,7 @@ namespace FinanceTracker.Application.Features.Transactions.Get;
 
 public record GetTransaction(Guid Id) : IRequest<Result<TransactionDto>>;
 
-public class Handler(AppDbContext dbContext) : IRequestHandler<GetTransaction, Result<TransactionDto>>
+public class Handler(IAppDbContext dbContext) : IRequestHandler<GetTransaction, Result<TransactionDto>>
 {
     public async Task<Result<TransactionDto>> Handle(GetTransaction request, CancellationToken cancellationToken)
     {

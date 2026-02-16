@@ -1,7 +1,7 @@
-﻿using FinanceTracker.Domain.Entities;
+﻿using FinanceTracker.Application.Common.Interfaces;
+using FinanceTracker.Domain.Entities;
 using FinanceTracker.Domain.Shared;
 using FinanceTracker.Domain.Shared.Errors;
-using FinanceTracker.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +11,7 @@ public static class DeleteTransaction
 {
     public record Command(Guid Id) : IRequest<Result>;
 
-    public class Handler(AppDbContext dbContext) : IRequestHandler<Command, Result>
+    public class Handler(IAppDbContext dbContext) : IRequestHandler<Command, Result>
     {
         public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
         {
