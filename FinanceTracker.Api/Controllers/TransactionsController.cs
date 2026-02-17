@@ -16,10 +16,10 @@ namespace FinanceTracker.Api.Controllers;
 public class TransactionsController(IMediator mediator, ICurrentUserService currentUserService) : ApiControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CreateTransactionDto dto)   
+    public async Task<ActionResult> Create([FromBody] CreateTransactionDto dto, CancellationToken cancellationToken)   
     {
         var command = dto.Adapt<CreateTransaction.Command>() with { OwnerId = currentUserService.UserId };
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command, cancellationToken);
 
         if (!result.IsSuccess)
         {
@@ -29,10 +29,10 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
         return CreatedAtAction(nameof(GetById), new { id = result.Value}, result.Value);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult> GetById(Guid id)
+    [HttpGet("{transactionId:guid}")]
+    public async Task<ActionResult> GetById(Guid transactionId, CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetTransaction(id));
+        var result = await mediator.Send(new GetTransaction(transactionId), cancellationToken);
 
         if (!result.IsSuccess)
         {
@@ -42,11 +42,19 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
         return Ok(result.Value);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> RemoveTransaction(Guid id)
+    [HttpGet]
+    public async Task<ActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var deleteCommand = new DeleteTransaction.Command(id);
-        var result = await mediator.Send(deleteCommand);
+        var transactions = await mediator.Send(new GetTransactions(), cancellationToken);
+
+        return Ok(transactions);
+    }
+
+    [HttpDelete("{transactionId:guid}")]
+    public async Task<ActionResult> Delete(Guid transactionId, CancellationToken cancellationToken)
+    {
+        var deleteCommand = new DeleteTransaction.Command(transactionId);
+        var result = await mediator.Send(deleteCommand, cancellationToken);
 
         if (!result.IsSuccess)
         {
@@ -56,8 +64,8 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
         return NoContent();
     }
 
-    [HttpPut("{transactionId}")]
-    public async Task<ActionResult> UpdateTransaction(Guid transactionId, [FromBody] CreateTransactionDto dto)
+    [HttpPut("{transactionId:guid}")]
+    public async Task<ActionResult> Update(Guid transactionId, [FromBody] CreateTransactionDto dto, CancellationToken cancellationToken)
     {
         var command = dto.Adapt<UpdateTransaction.Command>() with 
         { 
@@ -65,7 +73,7 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
             TransactionId = transactionId 
         };
 
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command, cancellationToken);
         if (!result.IsSuccess)
         {
             return HandleFailure(result);

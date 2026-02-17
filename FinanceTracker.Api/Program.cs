@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 var app = builder.Build();
 
 app.UseSerilogRequestLogging(options =>

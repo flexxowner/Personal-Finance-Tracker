@@ -2,7 +2,7 @@
 
 namespace FinanceTracker.Application.Features.Transactions.Create;
 
-public record CreateTransactionDto(
+public sealed record CreateTransactionDto(
     Guid AccountId,
     Guid CategoryId,
     decimal Amount,

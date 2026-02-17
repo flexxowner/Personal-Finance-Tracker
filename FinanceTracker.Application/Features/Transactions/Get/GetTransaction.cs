@@ -3,13 +3,16 @@ using FinanceTracker.Domain.Shared;
 using FinanceTracker.Domain.Shared.Errors;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Transactions;
+using Transaction = FinanceTracker.Domain.Entities.Transaction;
 
 namespace FinanceTracker.Application.Features.Transactions.Get;
 
 public record GetTransaction(Guid Id) : IRequest<Result<TransactionDto>>;
+public record GetTransactions() : IRequest<IReadOnlyCollection<TransactionDto>>;
 
-public class Handler(IAppDbContext dbContext) : IRequestHandler<GetTransaction, Result<TransactionDto>>
+public class Handler(IAppDbContext dbContext) : 
+    IRequestHandler<GetTransaction, Result<TransactionDto>>,
+    IRequestHandler<GetTransactions, IReadOnlyCollection<TransactionDto>>
 {
     public async Task<Result<TransactionDto>> Handle(GetTransaction request, CancellationToken cancellationToken)
     {
@@ -22,14 +25,19 @@ public class Handler(IAppDbContext dbContext) : IRequestHandler<GetTransaction, 
             return Result.Failure<TransactionDto>(new EntityNotFound<Transaction>(request.Id));
         }
 
-        return new TransactionDto(transaction.TransactionId)
-        {
-            Amount = transaction.Amount,
-            OccurredAtUtc = transaction.OccurredAtUtc,
-            ExchangeRate = transaction.ExchangeRate,
-            Note = transaction.Note,
-            TransactionCurrency = transaction.TransactionCurrency,
-            Type = transaction.Type
-        };
+        return MapTransaction(transaction);
     }
+
+    public async Task<IReadOnlyCollection<TransactionDto>> Handle(GetTransactions request, CancellationToken cancellationToken) 
+        => await dbContext.Transactions.Select(t => MapTransaction(t)).ToListAsync(cancellationToken);
+
+    private static TransactionDto MapTransaction(Transaction transaction) => new(transaction.TransactionId)
+    {
+        Amount = transaction.Amount,
+        OccurredAtUtc = transaction.OccurredAtUtc,
+        ExchangeRate = transaction.ExchangeRate,
+        Note = transaction.Note,
+        TransactionCurrency = transaction.TransactionCurrency,
+        Type = transaction.Type
+    };
 }

@@ -2,13 +2,24 @@
 
 public sealed class Category
 {
-    public Guid CategoryId { get; set; }
+    private Category() { }
 
-    public string Name { get; set; } = string.Empty;
+    public Category(string name, Guid ownerId)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name required");
 
-    public Guid OwnerId { get; set; }
+        CategoryId = Guid.NewGuid();
+        Name = name;
+        OwnerId = ownerId;
+    }
 
-    public User Owner {  get; set; }
+    public Guid CategoryId { get; private set; }
 
-    public ICollection<Transaction> Transactions { get; set; }
+    public string Name { get; private set; } = string.Empty;
+
+    public Guid OwnerId { get; private set; }
+
+    public User Owner { get; private set; } = null!;
+
+    public ICollection<Transaction> Transactions { get; set; } = [];
 }

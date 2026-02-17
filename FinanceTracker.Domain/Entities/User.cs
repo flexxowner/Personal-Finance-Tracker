@@ -2,21 +2,33 @@
 
 public sealed class User
 {
-    public Guid UserId { get; set; }
+    private User() { }
 
-    public string Email { get; set; } = string.Empty;
+    public User(string email, string passwordHash, DateTime createdUtc)
+    {
+        UserId = Guid.NewGuid();
+        Email = email;
+        PasswordHash = passwordHash;
+        CreatedUtc = createdUtc;
 
-    public string PasswordHash { get; set; } = string.Empty;
+        Profile = new Profile(UserId, "USD", email);
+    }
 
-    public DateTime CreatedUtc { get; set; }
+    public Guid UserId { get; private set; }
 
-    public Profile Profile { get; set; } = null!;
+    public string Email { get; private set; } = string.Empty;
 
-    public ICollection<Budget> Budgets { get; set; }
+    public string PasswordHash { get; private set; } = string.Empty;
 
-    public ICollection<Category> Categories { get; set; }
+    public DateTime CreatedUtc { get; private set; }
 
-    public ICollection<Transaction> Transactions { get; set; }
+    public Profile Profile { get; private set; } = null!;
 
-    public ICollection<Account> Accounts { get; set; }
+    public ICollection<Budget> Budgets { get; private set; } = [];
+
+    public ICollection<Category> Categories { get; private set; } = [];
+
+    public ICollection<Transaction> Transactions { get; private set; } = [];
+
+    public ICollection<Account> Accounts { get; private set; } = [];
 }
