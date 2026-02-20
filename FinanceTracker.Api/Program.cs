@@ -40,6 +40,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddCors(options => options.AddPolicy("AllowReactApp", policy =>
+{
+    policy.WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+}));
 var app = builder.Build();
 
 app.UseSerilogRequestLogging(options =>
@@ -65,6 +71,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

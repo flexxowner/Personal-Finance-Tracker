@@ -39,7 +39,7 @@ public sealed class Account
 
     public string Currency { get; private set; } = string.Empty;
 
-    public bool IsActive { get; private set; }
+    public bool IsActive { get; private set; } = true;
 
     public DateTime CreatedUtc { get; private set; }
 
@@ -73,6 +73,15 @@ public sealed class Account
         UpdatedUtc = DateTime.UtcNow;
     }
 
-    public void Deactivate() => IsActive = false;
+    public void Archive()
+    {
+        if (!IsActive)
+        {
+            return;
+        }
+
+        IsActive = false;
+    }
+
     public void Activate() => IsActive = true;
 }

@@ -29,7 +29,10 @@ public class Handler(IAppDbContext dbContext) :
     }
 
     public async Task<IReadOnlyCollection<TransactionDto>> Handle(GetTransactions request, CancellationToken cancellationToken) 
-        => await dbContext.Transactions.Select(t => MapTransaction(t)).ToListAsync(cancellationToken);
+        => await dbContext.Transactions
+        .AsNoTracking()
+        .Select(t => MapTransaction(t))
+        .ToListAsync(cancellationToken);
 
     private static TransactionDto MapTransaction(Transaction transaction) => new(transaction.TransactionId)
     {
