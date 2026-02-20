@@ -418,3 +418,15 @@ FodyWeavers.xsd
 *.msp
 
 .env
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+*.suo
+*.user
+bin/
+obj/
+
+## Windows
+Thumbs.db
+Desktop.ini
