@@ -1,7 +1,9 @@
 ﻿import React, {useState} from 'react';
 import api from '../api/axios.ts';
+import { useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,9 +17,9 @@ export const LoginPage = () => {
                 password: password
             });
             
-            const token = response.data;
-            console.log("Token:", token);
-            alert("Loged in! Token in the console.");
+            const token = response.data.token;
+            localStorage.setItem('token', token);
+            navigate('/');
         }
         catch (err: any) {
             console.error(err);

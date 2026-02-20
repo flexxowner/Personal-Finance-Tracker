@@ -1,6 +1,7 @@
 ﻿using FinanceTracker.Application.Features.Accounts;
 using FinanceTracker.Application.Features.Auth;
 using FinanceTracker.Application.Features.Transactions.Create;
+using FinanceTracker.Application.Features.User;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,7 @@ public static class DI
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IUserService, UserService>();
         return services;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using FinanceTracker.Application.Common.Interfaces;
 using FinanceTracker.Application.Common.Interfaces.Authentication;
-using FinanceTracker.Domain.Entities;
 using FinanceTracker.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +22,7 @@ public class AuthService(
 
         var passwordHash = passwordHasher.Hash(authCredentials.Password);
 
-        var user = new User(email: email, passwordHash: passwordHash, DateTime.UtcNow);
+        var user = new Domain.Entities.User(email: email, passwordHash: passwordHash, DateTime.UtcNow);
 
         await dbContext.Users.AddAsync(user, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);

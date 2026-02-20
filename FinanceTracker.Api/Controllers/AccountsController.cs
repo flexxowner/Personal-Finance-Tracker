@@ -59,4 +59,17 @@ public class AccountsController(
 
         return NoContent();
     }
+
+    [HttpDelete("{accountId:guid}")]
+    public async Task<ActionResult> Delete(Guid accountId, CancellationToken cancellationToken)
+    {
+        var result = await accountService.RemoveAsync(accountId, currentUserService.UserId, cancellationToken);
+
+        if (!result.IsSuccess)
+        {
+            return HandleFailure(result);
+        }
+        
+        return NoContent();
+    }
 }
