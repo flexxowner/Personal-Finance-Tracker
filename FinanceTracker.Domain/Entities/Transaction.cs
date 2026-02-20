@@ -1,5 +1,4 @@
 ﻿using FinanceTracker.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace FinanceTracker.Domain.Entities;
 
@@ -18,10 +17,10 @@ public sealed class Transaction
     public decimal ExchangeRate { get; private set; }
     public CategoryType Type { get; private set; }
 
-    public User Owner { get; private set; }
+    public User Owner { get; private set; } = null!;
     public Budget? Budget { get; private set; }
-    public Account Account { get; private set; }
-    public Category Category { get; private set; }
+    public Account Account { get; private set; } = null!;
+    public Category Category { get; private set; } = null!;
 
     private Transaction() { }
 
@@ -76,7 +75,7 @@ public sealed class Transaction
         Note = note ?? string.Empty;
     }
 
-    private void Validate(
+    private static void Validate(
         decimal amount,
         decimal exchangeRate, 
         string currency, 

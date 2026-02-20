@@ -23,20 +23,7 @@ public class AuthService(
 
         var passwordHash = passwordHasher.Hash(authCredentials.Password);
 
-        var user = new User
-        {
-            UserId = Guid.NewGuid(),
-            Email = email,
-            PasswordHash = passwordHash,
-            CreatedUtc = DateTime.UtcNow,
-            Profile = new Profile
-            {
-                ProfileId = Guid.NewGuid(),
-                DefaultCurrency = "USD",
-                DisplayName = "User",
-                TimeZone = TimeZoneInfo.Utc.DisplayName
-            }
-        };
+        var user = new User(email: email, passwordHash: passwordHash, DateTime.UtcNow);
 
         await dbContext.Users.AddAsync(user, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);

@@ -2,15 +2,29 @@
 
 public sealed class Profile
 {
-    public Guid ProfileId { get; set; }
+    private Profile() { }
 
-    public Guid OwnerId { get; set; }
+    public Profile(Guid ownerId, string defaultCurrency, string displayName)
+    {
+        if (string.IsNullOrWhiteSpace(displayName)) throw new ArgumentException("Name required");
+        if (string.IsNullOrWhiteSpace(defaultCurrency)) throw new ArgumentException("Currency required");
 
-    public string DefaultCurrency { get; set; } = string.Empty;
+        ProfileId = Guid.NewGuid();
+        OwnerId = ownerId;
+        DefaultCurrency = defaultCurrency;
+        DisplayName = displayName;
+        TimeZone = TimeZoneInfo.Utc.DisplayName;
+    }
 
-    public string TimeZone { get; set; } = string.Empty;
+    public Guid ProfileId { get; private set; }
 
-    public string DisplayName { get; set; } = string.Empty;
+    public Guid OwnerId { get; private set; }
 
-    public User Owner { get; set; } = null!;
+    public string DefaultCurrency { get; private set; } = string.Empty;
+
+    public string TimeZone { get; private set; } = string.Empty;
+
+    public string DisplayName { get; private set; } = string.Empty;
+
+    public User Owner { get; private set; } = null!;
 }
