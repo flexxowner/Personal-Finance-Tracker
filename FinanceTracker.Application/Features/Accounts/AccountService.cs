@@ -8,7 +8,7 @@ namespace FinanceTracker.Application.Features.Accounts;
 
 public class AccountService(IAppDbContext dbContext) : IAccountService
 {
-    public async Task<Result<Guid>> CreateAsync(CreateAccountDto request, Guid userId, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> CreateAsync(CreateAccountRequest request, Guid userId, CancellationToken cancellationToken)
     {
         var account = new Account(
             ownerId: userId,
@@ -29,7 +29,22 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             .AsNoTracking()
             .Where(a => a.OwnerId == userId)
             .Where(a => a.IsActive)
-            .Select(a => MapAccount(a))
+            .Select(a => new AccountDto(a.AccountId)
+            {
+                Name = a.Name,
+                AccountType = a.Type,
+                Balance = a.Balance,
+                Currency = a.Owner.Profile.DefaultCurrency,
+                CreatedUtc = a.CreatedUtc,
+                ActiveBudgetsCount = a.Transactions
+                    .SelectMany(t => t.Category.Budgets)
+                    .Where(b => !b.IsDeleted)
+                    .Where(b => b.PeriodEnd >= DateTime.UtcNow)
+                    .Select(b => b.BudgetId)
+                    .Distinct()
+                    .Count(),
+                TotalTransactionsCount = a.Transactions.Count
+            })
             .ToListAsync(cancellationToken);
 
     public async Task<Result<AccountDto>> GetByIdAsync(Guid accountId, Guid userId, CancellationToken cancellationToken)
@@ -44,7 +59,14 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             return Result.Failure<AccountDto>(new EntityNotFound<Account>(accountId));
         }
 
-        return MapAccount(account);
+        return new AccountDto(account.AccountId)
+        {
+            Name = account.Name,
+            AccountType = account.Type,
+            Balance = account.Balance,
+            Currency = account.Owner.Profile.DefaultCurrency,
+            CreatedUtc = account.CreatedUtc,
+        };
     }
 
     public async Task<Result> RemoveAsync(Guid id, Guid userId, CancellationToken cancellationToken)
@@ -63,7 +85,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         return Result.Success();
     }
 
-    public async Task<Result> UpdateAsync(Guid id, UpdateAccountDto request, Guid userId, CancellationToken cancellationToken)
+    public async Task<Result> UpdateAsync(Guid id, UpdateAccountRequest request, Guid userId, CancellationToken cancellationToken)
     {
         var accountToUpdate = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.OwnerId == userId && a.AccountId == id, cancellationToken);
@@ -78,13 +100,4 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
 
         return Result.Success();
     }
-
-    private static AccountDto MapAccount(Account account) => new(account.AccountId)
-    {
-        Name = account.Name,
-        AccountType = account.Type,
-        Balance = account.Balance,
-        Currency = account.Currency,
-        CreatedUtc = account.CreatedUtc
-    };
 }

@@ -21,31 +21,23 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
         var command = dto.Adapt<CreateTransaction.Command>() with { OwnerId = currentUserService.UserId };
         var result = await mediator.Send(command, cancellationToken);
 
-        if (!result.IsSuccess)
-        {
-            return HandleFailure(result);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value}, result.Value);
+        return result.IsSuccess 
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value}, result.Value)
+            : HandleFailure(result);
     }
 
     [HttpGet("{transactionId:guid}")]
     public async Task<ActionResult> GetById(Guid transactionId, CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetTransaction(transactionId), cancellationToken);
+        var result = await mediator.Send(new GetTransaction(transactionId, currentUserService.UserId), cancellationToken);
 
-        if (!result.IsSuccess)
-        {
-            return HandleFailure(result);  
-        }
-
-        return Ok(result.Value);
+        return result.IsSuccess ? Ok(result.Value) : HandleFailure(result);
     }
 
     [HttpGet]
     public async Task<ActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var transactions = await mediator.Send(new GetTransactions(), cancellationToken);
+        var transactions = await mediator.Send(new GetTransactions(currentUserService.UserId), cancellationToken);
 
         return Ok(transactions);
     }
@@ -56,12 +48,7 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
         var deleteCommand = new DeleteTransaction.Command(transactionId);
         var result = await mediator.Send(deleteCommand, cancellationToken);
 
-        if (!result.IsSuccess)
-        {
-            return HandleFailure(result);
-        }
-
-        return NoContent();
+        return result.IsSuccess ? NoContent() : HandleFailure(result);
     }
 
     [HttpPut("{transactionId:guid}")]
@@ -74,11 +61,6 @@ public class TransactionsController(IMediator mediator, ICurrentUserService curr
         };
 
         var result = await mediator.Send(command, cancellationToken);
-        if (!result.IsSuccess)
-        {
-            return HandleFailure(result);
-        }
-
-        return NoContent();
+        return result.IsSuccess ? NoContent() :  HandleFailure(result);
     }
 }

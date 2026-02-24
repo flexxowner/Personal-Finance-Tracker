@@ -38,18 +38,11 @@ internal class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.HasIndex(t => new { t.OwnerId, t.OccurredAtUtc });
         builder.HasIndex(t => t.AccountId);
         builder.HasIndex(t => t.CategoryId);
-        builder.HasIndex(t => t.BudgetId);
 
         builder.HasOne(t => t.Owner)
             .WithMany(u => u.Transactions)
             .HasForeignKey(t => t.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(t => t.Budget)
-            .WithMany(u => u.Transactions)
-            .HasForeignKey(t => t.BudgetId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasOne(t => t.Account)
             .WithMany(a => a.Transactions)

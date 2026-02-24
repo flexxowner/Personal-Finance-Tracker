@@ -1,6 +1,6 @@
 ﻿namespace FinanceTracker.Application.Features.Auth;
 
-public class AuthCredentialsDto
+public class AuthCredentialsRequest
 {
     public required string Email { get; set; }
 

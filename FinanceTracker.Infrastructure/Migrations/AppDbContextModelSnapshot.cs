@@ -63,7 +63,7 @@ namespace FinanceTracker.Infrastructure.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime>("UpdatedUtc")
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
@@ -194,9 +194,6 @@ namespace FinanceTracker.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<Guid?>("BudgetId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
@@ -227,8 +224,6 @@ namespace FinanceTracker.Infrastructure.Migrations
                     b.HasKey("TransactionId");
 
                     b.HasIndex("AccountId");
-
-                    b.HasIndex("BudgetId");
 
                     b.HasIndex("CategoryId");
 
@@ -281,11 +276,19 @@ namespace FinanceTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("FinanceTracker.Domain.Entities.Budget", b =>
                 {
+                    b.HasOne("FinanceTracker.Domain.Entities.Category", "Category")
+                        .WithMany("Budgets")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("FinanceTracker.Domain.Entities.User", "Owner")
                         .WithMany("Budgets")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Owner");
                 });
@@ -320,11 +323,6 @@ namespace FinanceTracker.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FinanceTracker.Domain.Entities.Budget", "Budget")
-                        .WithMany("Transactions")
-                        .HasForeignKey("BudgetId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("FinanceTracker.Domain.Entities.Category", "Category")
                         .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
@@ -339,8 +337,6 @@ namespace FinanceTracker.Infrastructure.Migrations
 
                     b.Navigation("Account");
 
-                    b.Navigation("Budget");
-
                     b.Navigation("Category");
 
                     b.Navigation("Owner");
@@ -351,13 +347,10 @@ namespace FinanceTracker.Infrastructure.Migrations
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("FinanceTracker.Domain.Entities.Budget", b =>
-                {
-                    b.Navigation("Transactions");
-                });
-
             modelBuilder.Entity("FinanceTracker.Domain.Entities.Category", b =>
                 {
+                    b.Navigation("Budgets");
+
                     b.Navigation("Transactions");
                 });
 

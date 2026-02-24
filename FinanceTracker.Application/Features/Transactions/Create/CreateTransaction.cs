@@ -58,8 +58,7 @@ public static class CreateTransaction
                 currency: request.TransactionCurrency,
                 exchangeRate: request.ExchangeRate,
                 occurredAt: request.OccurredAtUtc,
-                note: request.Note,
-                budgetId: request.BudgetId);
+                note: request.Note);
 
            context.Transactions.Add(transaction);
            await context.SaveChangesAsync(cancellationToken);
