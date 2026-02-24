@@ -45,6 +45,11 @@ internal class BudgetConfiguration : IEntityTypeConfiguration<Budget>
         builder.HasOne(b => b.Owner)
             .WithMany(b => b.Budgets)
             .HasForeignKey(b => b.OwnerId)
-            .OnDelete(DeleteBehavior.Cascade);            
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne(b => b.Category)
+            .WithMany(c => c.Budgets)
+            .HasForeignKey(b => b.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

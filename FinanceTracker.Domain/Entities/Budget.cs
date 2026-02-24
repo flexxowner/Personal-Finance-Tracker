@@ -46,14 +46,39 @@ public sealed class Budget
     public DateTime UpdatedUtc { get; private set; }
 
     public User Owner { get; private set; } = null!;
-
-    public ICollection<Transaction> Transactions { get; private set; } = [];
+    public Category Category { get; private set; } = null!;
 
     public void UpdateLimit(decimal newLimit)
     {
         if (newLimit <= 0) throw new ArgumentException("Limit must be positive");
 
         LimitAmount = newLimit;
+        UpdatedUtc = DateTime.UtcNow;
+    }
+    
+    public void Delete()
+    {
+        if (IsDeleted) return;
+
+        IsDeleted = true;
+        UpdatedUtc = DateTime.UtcNow;
+    }
+    
+    public void UpdateDetails(string name, decimal limit, DateTime start, DateTime end)
+    {
+        if (string.IsNullOrWhiteSpace(name)) 
+            throw new ArgumentException("Name cannot be empty");
+
+        if (limit <= 0) 
+            throw new ArgumentException("Limit must be positive");
+
+        if (start >= end) 
+            throw new ArgumentException("Start date must be before end date");
+        
+        Name = name;
+        LimitAmount = limit;
+        PeriodStart = start;
+        PeriodEnd = end;
         UpdatedUtc = DateTime.UtcNow;
     }
 }
