@@ -1,5 +1,6 @@
 ﻿using FinanceTracker.Application.Common.Interfaces;
 using FinanceTracker.Domain.Entities;
+using FinanceTracker.Domain.Enums;
 using FinanceTracker.Domain.Shared;
 using FinanceTracker.Domain.Shared.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -13,15 +14,21 @@ public class BudgetService(IAppDbContext dbContext) : IBudgetService
         var budgets = await dbContext.Budgets
             .AsNoTracking()
             .Where(b => b.OwnerId == userId)
-            .Select(b =>  new BudgetDto(b.BudgetId, b.CategoryId, b.Name, b.Owner.Profile.DefaultCurrency)
+            .Select(b => new BudgetDto(b.BudgetId, b.CategoryId, b.Name, b.Owner.Profile.DefaultCurrency)
             {
                 CategoryName = b.Category.Name,
                 PeriodEnd = b.PeriodEnd,
                 PeriodStart = b.PeriodStart,
-                LimitAmount = b.LimitAmount
+                LimitAmount = b.LimitAmount,
+                SpentAmount = dbContext.Transactions
+                    .Where(t => t.OwnerId == userId)
+                    .Where(t => t.CategoryId == b.CategoryId)
+                    .Where(t => t.OccurredAtUtc >= b.PeriodStart && t.OccurredAtUtc <= b.PeriodEnd)
+                    .Where(t => t.Type == CategoryType.Expense)
+                    .Sum(t => t.Amount)
             })
             .ToListAsync(cancellationToken);
-        
+
         return budgets;
     }
 
@@ -35,16 +42,17 @@ public class BudgetService(IAppDbContext dbContext) : IBudgetService
                 CategoryName = b.Category.Name,
                 PeriodEnd = b.PeriodEnd,
                 PeriodStart = b.PeriodStart,
-                LimitAmount = b.LimitAmount
+                LimitAmount = b.LimitAmount,
+                SpentAmount = dbContext.Transactions
+                    .Where(t => t.OwnerId == userId)
+                    .Where(t => t.CategoryId == b.CategoryId)
+                    .Where(t => t.OccurredAtUtc >= b.PeriodStart && t.OccurredAtUtc <= b.PeriodEnd)
+                    .Where(t => t.Type == CategoryType.Expense)
+                    .Sum(t => t.Amount)
             })
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (budgetDto is null)
-        {
-            return Result.Failure<BudgetDto>(new EntityNotFound<Budget>(budgetId));
-        }
-
-        return budgetDto;
+        return budgetDto ?? Result.Failure<BudgetDto>(new EntityNotFound<Budget>(budgetId));
     }
 
     public async Task<Result<Guid>> CreateAsync(CreateBudgetRequest request, Guid userId, CancellationToken cancellationToken)
@@ -68,10 +76,10 @@ public class BudgetService(IAppDbContext dbContext) : IBudgetService
             categoryId: request.CategoryId,
             currency: currency,
             limit: request.Limit);
-        
+
         await dbContext.Budgets.AddAsync(newBudget, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-        
+
         return newBudget.BudgetId;
     }
 
@@ -85,15 +93,15 @@ public class BudgetService(IAppDbContext dbContext) : IBudgetService
         {
             return Result.Failure(new EntityNotFound<Budget>(budgetId));
         }
-        
+
         budget.UpdateDetails(
-            name: request.Name, 
+            name: request.Name,
             start: request.PeriodStart,
-            end: request.PeriodEnd, 
+            end: request.PeriodEnd,
             limit: request.Limit);
-        
+
         await dbContext.SaveChangesAsync(cancellationToken);
-        
+
         return Result.Success();
     }
 
@@ -106,7 +114,7 @@ public class BudgetService(IAppDbContext dbContext) : IBudgetService
         {
             return Result.Failure(new EntityNotFound<Budget>(budgetId));
         }
-        
+
         budgetToDelete.Delete();
         await dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success();
