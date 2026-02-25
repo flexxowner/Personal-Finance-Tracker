@@ -1,0 +1,67 @@
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# C# files
+[*.cs]
+dotnet_language_version = preview
+
+# Use file-scoped namespaces
+csharp_style_namespace_declarations = file_scoped:warning
+
+# Prefer primary constructors for classes and records
+csharp_style_prefer_primary_constructors = true:warning
+
+# Prefer 'var' when the type is apparent, but be explicit when it's not
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_when_type_is_not_apparent = false:warning
+csharp_style_var_for_built_in_types = true:warning
+
+# Always use braces for control blocks
+csharp_prefer_braces = always:warning
+
+# Organize usings - place System namespaces first and remove unused usings
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# General analyzer strictness (style, design, and naming as warnings)
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+dotnet_analyzer_diagnostic.category-Design.severity = warning
+dotnet_analyzer_diagnostic.category-Naming.severity = warning
+dotnet_diagnostic.CA2007.severity = none
+
+########################################################
+# Naming rules
+########################################################
+
+# Interfaces must start with 'I'
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.interfaces.required_modifiers =
+
+dotnet_naming_style.interface_prefix_i.capitalization = pascal_case
+dotnet_naming_style.interface_prefix_i.required_prefix = I
+
+dotnet_naming_rule.interfaces_must_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_must_start_with_i.style = interface_prefix_i
+dotnet_naming_rule.interfaces_must_start_with_i.severity = warning
+
+# Private fields must start with '_' and be camelCase after the prefix
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers =
+
+dotnet_naming_style.private_field_underscore_prefix.capitalization = camel_case
+dotnet_naming_style.private_field_underscore_prefix.required_prefix = _
+
+dotnet_naming_rule.private_fields_must_start_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_must_start_with_underscore.style = private_field_underscore_prefix
+dotnet_naming_rule.private_fields_must_start_with_underscore.severity = warning
+
