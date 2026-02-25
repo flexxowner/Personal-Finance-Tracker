@@ -8,7 +8,7 @@ namespace FinanceTracker.Api.Controllers;
 public class AuthController(IAuthService authService) : ApiControllerBase
 {
     [HttpPost("register")]
-    public async Task<ActionResult> Register([FromBody] AuthCredentialsDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Register([FromBody] AuthCredentialsRequest request, CancellationToken cancellationToken)
     {
         var registrationResult = await authService.RegisterAsync(request, cancellationToken);
         if (!registrationResult.IsSuccess)
@@ -16,18 +16,14 @@ public class AuthController(IAuthService authService) : ApiControllerBase
             return HandleFailure(registrationResult);
         }
 
-        return Ok(new { token = registrationResult.Value });
+        return registrationResult.IsSuccess ? Ok(new { token = registrationResult.Value }) : HandleFailure(registrationResult);
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> Login([FromBody] AuthCredentialsDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Login([FromBody] AuthCredentialsRequest request, CancellationToken cancellationToken)
     {
         var loginResult = await authService.LoginAsync(request, cancellationToken);
-        if (!loginResult.IsSuccess)
-        {
-            return HandleFailure(loginResult);
-        }
 
-        return Ok(new { token = loginResult.Value });
+        return loginResult.IsSuccess ? Ok(new { token = loginResult.Value }) : HandleFailure(loginResult);
     }
 }

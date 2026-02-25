@@ -38,8 +38,7 @@ internal class AccountConfiguration : IEntityTypeConfiguration<Account>
             .ValueGeneratedOnAdd();
 
         builder.Property(a => a.UpdatedUtc)
-            .HasDefaultValueSql("NOW()")
-            .ValueGeneratedOnAddOrUpdate();
+            .HasDefaultValueSql("NOW()");
 
         builder.HasIndex(a => new { a.OwnerId, a.IsActive });
 

@@ -11,7 +11,7 @@ public class AuthService(
     IPasswordHasher passwordHasher,
     IJwtProvider jwtProvider) : IAuthService
 {
-    public async Task<Result<string>> RegisterAsync(AuthCredentialsDto authCredentials, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> RegisterAsync(AuthCredentialsRequest authCredentials, CancellationToken cancellationToken = default)
     {
         var email = authCredentials.Email;
         var emailExists = await dbContext.Users.AnyAsync(u => u.Email == email, cancellationToken);
@@ -31,7 +31,7 @@ public class AuthService(
         return jwtProvider.Generate(user);
     }
 
-    public async Task<Result<string>> LoginAsync(AuthCredentialsDto authCredentials, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> LoginAsync(AuthCredentialsRequest authCredentials, CancellationToken cancellationToken = default)
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == authCredentials.Email, cancellationToken);
         if (user is null)

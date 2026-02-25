@@ -66,7 +66,6 @@ public static class UpdateTransaction
                 exchangeRate: request.ExchangeRate,
                 categoryId: request.CategoryId,
                 accountId: request.AccountId,
-                budgetId: request.BudgetId,
                 note: request.Note);
 
             await dbContext.SaveChangesAsync(cancellationToken);

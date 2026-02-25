@@ -56,7 +56,7 @@ public sealed class Account
         UpdatedUtc = DateTime.UtcNow;
     }
 
-    public void Withdrow(decimal amount)
+    public void Withdraw(decimal amount)
     {
         if (amount <= 0) throw new ArgumentException("Withdrawal amount must be positive");
         if (Balance - amount < 0) throw new ArgumentException("Balance amount must be positive");

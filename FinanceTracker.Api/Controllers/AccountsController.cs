@@ -17,21 +17,17 @@ public class AccountsController(
     public async Task<ActionResult> GetAll(CancellationToken cancellationToken)
     {
         var accounts = await accountService.GetAllAsync(currentUserService.UserId, cancellationToken);
-
         return Ok(accounts);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CreateAccountDto account, CancellationToken cancellationToken)
+    public async Task<ActionResult> Create([FromBody] CreateAccountRequest account, CancellationToken cancellationToken)
     {
         var createResult = await accountService.CreateAsync(account, currentUserService.UserId, cancellationToken);
 
-        if (!createResult.IsSuccess)
-        {
-            return HandleFailure(createResult);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { accountId = createResult.Value }, createResult.Value);
+        return createResult.IsSuccess 
+            ? CreatedAtAction(nameof(GetById), new { accountId = createResult.Value }, createResult.Value)
+            : HandleFailure(createResult);
     }
 
     [HttpGet("{accountId:guid}")]
@@ -39,24 +35,14 @@ public class AccountsController(
     {
         var getResult = await accountService.GetByIdAsync(accountId, currentUserService.UserId, cancellationToken);
 
-        if (!getResult.IsSuccess)
-        {
-            return HandleFailure(getResult);
-        }
-
-        return Ok(getResult.Value);
+        return getResult.IsSuccess ? Ok(getResult.Value) : HandleFailure(getResult) ;
     }
 
     [HttpPut("{accountId:guid}")]
-    public async Task<ActionResult> Update(Guid accountId, [FromBody] UpdateAccountDto updateAccount, CancellationToken cancellationToken)
+    public async Task<ActionResult> Update(Guid accountId, [FromBody] UpdateAccountRequest updateAccount, CancellationToken cancellationToken)
     {
         var result = await accountService.UpdateAsync(accountId, updateAccount, currentUserService.UserId, cancellationToken);
 
-        if (!result.IsSuccess)
-        {
-            return HandleFailure(result);
-        }
-
-        return NoContent();
+        return result.IsSuccess ? NoContent() : HandleFailure(result);
     }
 }

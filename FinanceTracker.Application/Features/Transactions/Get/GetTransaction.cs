@@ -7,8 +7,8 @@ using Transaction = FinanceTracker.Domain.Entities.Transaction;
 
 namespace FinanceTracker.Application.Features.Transactions.Get;
 
-public record GetTransaction(Guid Id) : IRequest<Result<TransactionDto>>;
-public record GetTransactions() : IRequest<IReadOnlyCollection<TransactionDto>>;
+public record GetTransaction(Guid Id, Guid UserId) : IRequest<Result<TransactionDto>>;
+public record GetTransactions(Guid UserId) : IRequest<IReadOnlyCollection<TransactionDto>>;
 
 public class Handler(IAppDbContext dbContext) : 
     IRequestHandler<GetTransaction, Result<TransactionDto>>,
@@ -18,7 +18,7 @@ public class Handler(IAppDbContext dbContext) :
     {
         var transaction = await dbContext.Transactions
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.TransactionId == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(t => t.TransactionId == request.Id && t.OwnerId == request.UserId, cancellationToken);
 
         if (transaction is null)
         {
@@ -31,6 +31,7 @@ public class Handler(IAppDbContext dbContext) :
     public async Task<IReadOnlyCollection<TransactionDto>> Handle(GetTransactions request, CancellationToken cancellationToken) 
         => await dbContext.Transactions
         .AsNoTracking()
+        .Where(t => t.OwnerId == request.UserId)
         .Select(t => MapTransaction(t))
         .ToListAsync(cancellationToken);
 

@@ -21,5 +21,6 @@ public sealed class Category
 
     public User Owner { get; private set; } = null!;
 
-    public ICollection<Transaction> Transactions { get; set; } = [];
+    public ICollection<Transaction> Transactions { get; private set; } = [];
+    public ICollection<Budget> Budgets { get; private set; } = [];
 }

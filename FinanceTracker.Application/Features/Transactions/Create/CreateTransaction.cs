@@ -25,24 +25,24 @@ public static class CreateTransaction
         public Guid AccountId { get; init; }
     }
 
-    public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Guid>>
+    public sealed class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var accountExists = await context
-                .Accounts
-                .AsNoTracking()
-                .AnyAsync(a => a.AccountId == request.AccountId, cancellationToken: cancellationToken);
+            var account = await context.Accounts
+                .FirstOrDefaultAsync(a =>
+                    a.AccountId == request.AccountId &&
+                    a.OwnerId == request.OwnerId,
+                    cancellationToken);
 
-            var categoryExists = await context
-                .Categories
-                .AsNoTracking()
-                .AnyAsync(a => a.CategoryId == request.CategoryId, cancellationToken: cancellationToken);
-
-            if (!accountExists)
+            if (account is null)
             {
                 return Result.Failure<Guid>(new EntityNotFound<Account>(request.AccountId));
             }
+
+            var categoryExists = await context.Categories
+                .AsNoTracking()
+                .AnyAsync(c => c.CategoryId == request.CategoryId, cancellationToken);
 
             if (!categoryExists)
             {
@@ -58,13 +58,29 @@ public static class CreateTransaction
                 currency: request.TransactionCurrency,
                 exchangeRate: request.ExchangeRate,
                 occurredAt: request.OccurredAtUtc,
-                note: request.Note,
-                budgetId: request.BudgetId);
+                note: request.Note
+            );
 
-           context.Transactions.Add(transaction);
-           await context.SaveChangesAsync(cancellationToken);
+            if (request.Type == CategoryType.Income)
+            {
+                account.Deposit(request.Amount);
+            }
+            else
+            {
+                try
+                {
+                    account.Withdraw(request.Amount);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Result.Failure<Guid>(new ResultError(ErrorType.Validation, ex.Message));
+                }
+            }
 
-           return transaction.TransactionId;
+            context.Transactions.Add(transaction);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return transaction.TransactionId;
         }
     }
 }

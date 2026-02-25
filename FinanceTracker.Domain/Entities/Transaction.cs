@@ -6,7 +6,6 @@ public sealed class Transaction
 {
     public Guid TransactionId { get; private set; }
     public Guid CategoryId { get; private set; }
-    public Guid? BudgetId { get; private set; }
     public Guid OwnerId { get; private set; }
     public Guid AccountId { get; private set; }
 
@@ -18,7 +17,6 @@ public sealed class Transaction
     public CategoryType Type { get; private set; }
 
     public User Owner { get; private set; } = null!;
-    public Budget? Budget { get; private set; }
     public Account Account { get; private set; } = null!;
     public Category Category { get; private set; } = null!;
 
@@ -33,8 +31,7 @@ public sealed class Transaction
         string currency,
         decimal exchangeRate,
         DateTime occurredAt,
-        string? note,
-        Guid? budgetId = null)
+        string? note)
     {
         Validate(amount, exchangeRate, currency, accountId, categoryId, ownerId);
 
@@ -48,7 +45,6 @@ public sealed class Transaction
         ExchangeRate = exchangeRate;
         OccurredAtUtc = occurredAt;
         Note = note ?? string.Empty;
-        BudgetId = budgetId;
     }
 
     public void Update(
@@ -59,7 +55,6 @@ public sealed class Transaction
         CategoryType type,
         Guid categoryId,
         Guid accountId,
-        Guid? budgetId,
         string? note)
     {
         Validate(amount, exchangeRate, transactionCurrency, accountId, categoryId, OwnerId);
@@ -71,7 +66,6 @@ public sealed class Transaction
         Type = type;
         CategoryId = categoryId;
         AccountId = accountId;
-        BudgetId = budgetId;
         Note = note ?? string.Empty;
     }
 
