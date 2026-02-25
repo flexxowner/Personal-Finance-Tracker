@@ -3,10 +3,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="BCrypt.Net-Next" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FinanceTracker.Application\FinanceTracker.Application.csproj" />
     <ProjectReference Include="..\FinanceTracker.Domain\FinanceTracker.Domain.csproj" />
   </ItemGroup>
 
